@@ -1,0 +1,31 @@
+using System.Text.Json;
+using UndertaleModLib;
+using UndertaleModLib.Models;
+
+namespace vividstasisModLoader;
+
+public class ObjectPatcher(UndertaleData data, string modDir)
+{
+    private string _objectPath = $"{modDir}/objects/";
+    public void Execute()
+    {
+        if (!Directory.Exists(_objectPath)) return;
+        var files = Directory.EnumerateFiles(_objectPath, "*.json");
+        foreach (var objJson in files)
+        {
+            var objectPatch = JsonSerializer.Deserialize<ObjectPatch>(File.ReadAllText(objJson));
+            if (string.IsNullOrEmpty(objectPatch.Name)) continue;
+            var obj = new UndertaleGameObject();
+            obj.Name = data.Strings.MakeString(objectPatch.Name);
+            obj.ParentId = data.GameObjects.ByName(objectPatch.Parent);
+            obj.Awake = objectPatch.Awake;
+            data.GameObjects.Add(obj);
+        }
+    }
+}
+public class ObjectPatch
+{
+    public string Name { get; set; }
+    public string Parent { get; set; }
+    public bool Awake { get; set; }
+}
