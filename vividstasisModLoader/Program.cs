@@ -4,6 +4,9 @@ using UndertaleModLib;
 using vividstasisModLoader;
 using static vividstasisModLoader.ConsoleOutput;
 
+const string VERSION = "v0.1.0";
+const string CHANGE_LOG = "美化日志输出和停留体验；新增 dry-run 模式，模拟修补流程但不实际修改文件。";
+
 // 判断命令行参数中是否包含目标参数。
 bool HasArg(string[] inputArgs, string expected)
 {
@@ -546,7 +549,7 @@ void PauseAfterPatch(bool dryRun)
 // 统一执行主流程。
 void Run(string[] inputArgs)
 {
-    PrintSection("vividstasis 模组加载器", "vividstasis Mod Loader");
+    PrintAppBanner("vividstasis 模组加载器", "vividstasis Mod Loader", VERSION, CHANGE_LOG);
 
     var restoreMode = IsRestoreMode(inputArgs);
     var dryRun = IsDryRunMode(inputArgs);

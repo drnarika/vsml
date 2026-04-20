@@ -122,6 +122,30 @@ internal static class ConsoleOutput
     }
 
     /// <summary>
+    /// 输出程序启动 Banner（矩形方框），展示标题、版本与变更日志。
+    /// </summary>
+    internal static void PrintAppBanner(string titleZh, string titleEn, string version, string changeLog)
+    {
+        var panelContent = new Rows(
+            new Align(new Markup($"[bold orange1]{EscapeMarkup(titleZh)}[/]"), HorizontalAlignment.Center),
+            new Align(new Markup($"[grey]{EscapeMarkup(titleEn)}[/]"), HorizontalAlignment.Center),
+            new Markup(string.Empty),
+            new Markup($"[aqua]VERSION[/]: [white]{EscapeMarkup(version)}[/]"),
+            new Markup($"[aqua]CHANGE_LOG[/]: [white]{EscapeMarkup(changeLog)}[/]")
+        );
+
+        var panel = new Panel(panelContent)
+        {
+            Border = BoxBorder.Rounded,
+            Padding = new Padding(1, 1, 1, 1)
+        };
+
+        AnsiConsole.Write(panel);
+        WriteLogLine("SECTION", $"{titleZh} | 版本: {version}", $"{titleEn} | Version: {version}");
+        WriteLogLine("INFO", $"变更日志: {changeLog}", $"Change log: {changeLog}");
+    }
+
+    /// <summary>
     /// 读取双语提示下的游戏路径输入。
     /// </summary>
     internal static string AskGamePath()
