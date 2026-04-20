@@ -15,9 +15,15 @@ public class SpriteReplacer(UndertaleData data,string modDir)
     bool noMasksForBasicRectangles = data.IsVersionAtLeast(2022, 9);
     private string importFolder = $"{modDir}/sprites";
     string packDir = "./packager";
+
+    public bool Exist()
+    {
+        return Directory.Exists(importFolder);
+    }
+
     public void Execute()
     {
-        if (!Directory.Exists(importFolder)) return;
+        if (!Exist()) return;
         Directory.CreateDirectory(packDir);
         try
         {

@@ -18,8 +18,16 @@ public class CodePatcher(UndertaleData data, string modDir)
     private Dictionary<string, string> _cachedCodes = [];
 
     const string objectPrefix = "gml_Object_";
+
+    public bool Exist()
+    {
+        return Directory.Exists(_codeReplacePath) || File.Exists(_patchFilePath);
+    }
+
     public void Execute()
     {
+        if (!Exist()) return;
+
         if (Directory.Exists(_codeReplacePath))
         {
             CodeImportGroup replaceGroup = new(data) { AutoCreateAssets = true };

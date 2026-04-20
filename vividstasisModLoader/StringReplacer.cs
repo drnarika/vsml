@@ -9,9 +9,14 @@ public class StringReplacer(UndertaleData data,string modDir)
     private readonly string _excelPath = $"{modDir}/excel";
     private readonly Dictionary<string, string> _replaceDict = new();
 
+    public bool Exist()
+    {
+        return Directory.Exists(_excelPath);
+    }
+
     public void Execute()
     {
-        if(!Directory.Exists(_excelPath)) return;
+        if(!Exist()) return;
         foreach (var file in Directory.GetFiles(_excelPath, "*.xlsx"))
         {
             using var stream = new FileStream(file, FileMode.Open);

@@ -6,9 +6,15 @@ namespace vividstasisModLoader;
 public class AudioReplacer(UndertaleData data, string gameDir, string modDir)
 {
     readonly string _importFolder = $"{modDir}/audios";
+
+    public bool Exist()
+    {
+        return Directory.Exists(_importFolder);
+    }
+
     public void Execute()
     {
-        if(!Directory.Exists(_importFolder)) return;
+        if(!Exist()) return;
         UndertaleEmbeddedAudio audioFile = null;
         int audioID = -1;
         int audioGroupID = -1;

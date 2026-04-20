@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="NPOI" Version="2.7.4" />
+    <PackageReference Include="Spectre.Console" Version="0.55.2" />
   </ItemGroup>
 
   <ItemGroup>

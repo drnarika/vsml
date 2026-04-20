@@ -7,9 +7,15 @@ namespace vividstasisModLoader;
 public class ObjectPatcher(UndertaleData data, string modDir)
 {
     private string _objectPath = $"{modDir}/objects/";
+
+    public bool Exist()
+    {
+        return Directory.Exists(_objectPath);
+    }
+
     public void Execute()
     {
-        if (!Directory.Exists(_objectPath)) return;
+        if (!Exist()) return;
         var files = Directory.EnumerateFiles(_objectPath, "*.json");
         foreach (var objJson in files)
         {

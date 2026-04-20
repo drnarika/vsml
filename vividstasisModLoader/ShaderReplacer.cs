@@ -7,9 +7,15 @@ namespace vividstasisModLoader;
 public class ShaderReplacer(UndertaleData data, string modDir)
 {
     readonly string _importFolder = $"{modDir}/shaders";
+
+    public bool Exist()
+    {
+        return Directory.Exists(_importFolder);
+    }
+
     public void Execute()
     {
-        if (!Directory.Exists(_importFolder)) return;
+        if (!Exist()) return;
 
         var shadersToModify = Directory.GetDirectories(_importFolder).Select(x => Path.GetFileName(x));
         var shadersExisting = new List<string>();

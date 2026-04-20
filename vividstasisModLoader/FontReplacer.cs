@@ -16,9 +16,14 @@ public class FontReplacer(UndertaleData data,string modDir)
 
     private readonly Packer _packer = new();
 
+    public bool Exist()
+    {
+        return Directory.Exists(_sourcePath);
+    }
+
     public void Execute()
     {
-        if(!Directory.Exists(_sourcePath)) return;
+        if(!Exist()) return;
         Directory.CreateDirectory(PackagerDirPath);
         _packer.Process(_sourcePath, SearchPattern, TextureSize, Border);
         _packer.SaveAtlasses(_outName);
