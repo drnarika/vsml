@@ -41,17 +41,17 @@ public class CodePatcher(UndertaleData data, string modDir)
                 {
                     var lastUnderscore = codeName.LastIndexOf('_');
                     var secondLastUnderscore = codeName.LastIndexOf('_', lastUnderscore - 1);
-                    //Console.WriteLine(lastUnderscore + " " + secondLastUnderscore);
+                    // 调试时可在此观察下划线分割位置。
                     if (lastUnderscore <= 0 || secondLastUnderscore <= 0)
                     {
-                        Console.Error.WriteLine($"Failed to parse object code entry name: \"{codeName}\"");
+                        ConsoleOutput.PrintError($"无法解析对象代码条目名：\"{codeName}\"。", $"Failed to parse object code entry name: \"{codeName}\".");
                         continue;
                     }
 
                     // Extract object name, event type, and event subtype
                     var objectName = codeName.AsSpan(new Range(objectPrefix.Length, secondLastUnderscore));
                     var eventType = codeName.AsSpan(new Range(secondLastUnderscore + 1, lastUnderscore));
-                    Console.WriteLine("OBJ_NAME,EVENTTYPE: " +objectName.ToString()+" "+eventType.ToString());
+                    ConsoleOutput.PrintInfo($"对象名与事件类型：{objectName.ToString()} / {eventType.ToString()}", $"Object and event type: {objectName.ToString()} / {eventType.ToString()}");
                     if (!uint.TryParse(codeName.AsSpan(lastUnderscore + 1), out var eventSubtype))
                     {
                         // No number at the end of the name; parse it out as best as possible (may technically be ambiguous sometimes...).
@@ -86,7 +86,7 @@ public class CodePatcher(UndertaleData data, string modDir)
                         }
                         else
                         {
-                            Console.Error.WriteLine($"Failed to parse event type and subtype for \"{codeName}\".");
+                            ConsoleOutput.PrintError($"无法解析事件类型和子类型：\"{codeName}\"。", $"Failed to parse event type and subtype for \"{codeName}\".");
                             continue;
                         }
                     }
@@ -100,7 +100,8 @@ public class CodePatcher(UndertaleData data, string modDir)
                      var _result = utdat.Import();
                         if (!_result.Successful)
                         {
-                            Console.Error.WriteLine("Code import unsuccessful:\n" + _result.PrintAllErrors(false));
+                            ConsoleOutput.PrintError("代码导入失败。", "Code import unsuccessful.");
+                            ConsoleOutput.PrintError(_result.PrintAllErrors(false), _result.PrintAllErrors(false));
                         }
                         continue;
                     }
@@ -139,7 +140,7 @@ public class CodePatcher(UndertaleData data, string modDir)
         {
             var code = data.Code.ByName(patch.Entry);
             if (code is null) {
-                Console.WriteLine($"Entry {patch.Entry} doesn't exists.");
+                ConsoleOutput.PrintWarning($"条目 {patch.Entry} 不存在。", $"Entry {patch.Entry} doesn't exist.");
                 return; }
                 
             if (!_cachedCodes.TryGetValue(patch.Entry, out string text))
@@ -189,7 +190,8 @@ public class CodePatcher(UndertaleData data, string modDir)
         var result = group.Import();
         if (!result.Successful)
         {
-            Console.Error.WriteLine("Code import unsuccessful:\n" + result.PrintAllErrors(false));
+            ConsoleOutput.PrintError("代码导入失败。", "Code import unsuccessful.");
+            ConsoleOutput.PrintError(result.PrintAllErrors(false), result.PrintAllErrors(false));
         }
     }
 

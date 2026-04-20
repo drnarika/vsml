@@ -123,7 +123,7 @@ public class SpriteReplacer(UndertaleData data,string modDir)
                             }
                             catch (Exception e)
                             {
-                                Console.Error.WriteLine($"Error: Image {stripped} has an invalid name. Skipping...");
+                                ConsoleOutput.PrintError($"图片命名无效，已跳过：{stripped}", $"Invalid image name, skipping: {stripped}");
                                 continue;
                             }
 
