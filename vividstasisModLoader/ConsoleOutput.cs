@@ -1,4 +1,5 @@
 using Spectre.Console;
+using System.Text;
 
 namespace vividstasisModLoader;
 
@@ -7,6 +8,56 @@ namespace vividstasisModLoader;
 /// </summary>
 internal static class ConsoleOutput
 {
+    private static readonly object LogLock = new();
+    private static readonly string LogDirectoryPath = string.Empty;
+    private static readonly string LogFilePath = string.Empty;
+    private static readonly StreamWriter? LogWriter;
+
+    static ConsoleOutput()
+    {
+        try
+        {
+            LogDirectoryPath = Path.Combine(AppContext.BaseDirectory, "app-logs");
+            Directory.CreateDirectory(LogDirectoryPath);
+
+            LogFilePath = Path.Combine(LogDirectoryPath, $"vsml-{DateTime.Now:yyyyMMdd-HHmmss}.log");
+            LogWriter = new StreamWriter(LogFilePath, false, new UTF8Encoding(false))
+            {
+                AutoFlush = true
+            };
+
+            AppDomain.CurrentDomain.ProcessExit += (_, _) =>
+            {
+                lock (LogLock)
+                {
+                    LogWriter?.Dispose();
+                }
+            };
+
+            WriteLogLine("SYSTEM", "日志已初始化。", $"Log initialized at: {LogFilePath}");
+        }
+        catch
+        {
+            // 日志初始化失败时不中断主流程。
+        }
+    }
+
+    /// <summary>
+    /// 将日志写入 app-logs 目录下的当前运行日志文件。
+    /// </summary>
+    private static void WriteLogLine(string level, string zh, string en)
+    {
+        if (LogWriter is null)
+        {
+            return;
+        }
+
+        lock (LogLock)
+        {
+            LogWriter.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] [{level}] {zh} ({en})");
+        }
+    }
+
     /// <summary>
     /// 对文本进行转义，避免 Spectre Markup 特殊字符导致渲染异常。
     /// </summary>
@@ -21,6 +72,7 @@ internal static class ConsoleOutput
     internal static void PrintInfo(string zh, string en)
     {
         AnsiConsole.MarkupLine($"[cyan]信息[/][white] {EscapeMarkup(zh)}[/] [grey]({EscapeMarkup(en)})[/]");
+        WriteLogLine("INFO", zh, en);
     }
 
     /// <summary>
@@ -29,6 +81,7 @@ internal static class ConsoleOutput
     internal static void PrintStep(string zh, string en)
     {
         AnsiConsole.MarkupLine($"[deepskyblue2]步骤[/][white] {EscapeMarkup(zh)}[/] [grey]({EscapeMarkup(en)})[/]");
+        WriteLogLine("STEP", zh, en);
     }
 
     /// <summary>
@@ -37,6 +90,7 @@ internal static class ConsoleOutput
     internal static void PrintSuccess(string zh, string en)
     {
         AnsiConsole.MarkupLine($"[green]成功[/][white] {EscapeMarkup(zh)}[/] [grey]({EscapeMarkup(en)})[/]");
+        WriteLogLine("SUCCESS", zh, en);
     }
 
     /// <summary>
@@ -45,6 +99,7 @@ internal static class ConsoleOutput
     internal static void PrintWarning(string zh, string en)
     {
         AnsiConsole.MarkupLine($"[yellow]警告[/][white] {EscapeMarkup(zh)}[/] [grey]({EscapeMarkup(en)})[/]");
+        WriteLogLine("WARN", zh, en);
     }
 
     /// <summary>
@@ -53,6 +108,7 @@ internal static class ConsoleOutput
     internal static void PrintError(string zh, string en)
     {
         AnsiConsole.MarkupLine($"[red]错误[/][white] {EscapeMarkup(zh)}[/] [grey]({EscapeMarkup(en)})[/]");
+        WriteLogLine("ERROR", zh, en);
     }
 
     /// <summary>
@@ -62,6 +118,7 @@ internal static class ConsoleOutput
     {
         var title = $"[bold orange1]{EscapeMarkup(zh)}[/] [grey]({EscapeMarkup(en)})[/]";
         AnsiConsole.Write(new Rule(title));
+        WriteLogLine("SECTION", zh, en);
     }
 
     /// <summary>
@@ -69,7 +126,10 @@ internal static class ConsoleOutput
     /// </summary>
     internal static string AskGamePath()
     {
-        return AnsiConsole.Ask<string>("[yellow]请输入游戏路径 / Please input the game path:[/]");
+        WriteLogLine("INPUT", "请求输入游戏路径。", "Prompting for game path.");
+        var gamePath = AnsiConsole.Ask<string>("[yellow]请输入游戏路径 / Please input the game path:[/]");
+        WriteLogLine("INPUT", $"输入游戏路径：{gamePath}", $"Input game path: {gamePath}");
+        return gamePath;
     }
 
     /// <summary>
@@ -78,6 +138,7 @@ internal static class ConsoleOutput
     internal static void PrintRestoreModeCompleted()
     {
         AnsiConsole.MarkupLine("[green]还原模式已完成。[/] [grey](Restore mode completed.)[/]");
+        WriteLogLine("SUCCESS", "还原模式已完成。", "Restore mode completed.");
     }
 
     /// <summary>
@@ -86,6 +147,7 @@ internal static class ConsoleOutput
     internal static void PrintPauseHint()
     {
         AnsiConsole.MarkupLine("[green]修补完成，按 Enter 退出。[/] [grey](Patching completed, press Enter to exit.)[/]");
+        WriteLogLine("INFO", "修补完成，等待用户按 Enter 退出。", "Patching completed, waiting for Enter to exit.");
         Console.ReadLine();
     }
 }
