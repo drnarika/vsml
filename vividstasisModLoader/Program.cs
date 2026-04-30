@@ -7,6 +7,33 @@ using static vividstasisModLoader.ConsoleOutput;
 const string VERSION = "v0.1.0";
 const string CHANGE_LOG = "美化日志输出和停留体验；新增 dry-run 模式，模拟修补流程但不实际修改文件。";
 
+// 判断路径中是否包含中文或少量真正危险的特殊字符。
+bool HasUnsafePathCharacters(string path)
+{
+    foreach (var ch in path)
+    {
+        if (IsChineseCharacter(ch))
+        {
+            return true;
+        }
+
+        if (ch is '*' or '?' or '"' or '<' or '>' or '|')
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// 判断字符是否属于常见中文字符范围。
+bool IsChineseCharacter(char ch)
+{
+    return (ch >= '\u4e00' && ch <= '\u9fff')
+        || (ch >= '\u3400' && ch <= '\u4dbf')
+        || (ch >= '\uF900' && ch <= '\uFAFF');
+}
+
 // 判断命令行参数中是否包含目标参数。
 bool HasArg(string[] inputArgs, string expected)
 {
@@ -550,6 +577,18 @@ void PauseAfterPatch(bool dryRun)
 void Run(string[] inputArgs)
 {
     PrintAppBanner("vividstasis 模组加载器", "vividstasis Mod Loader", VERSION, CHANGE_LOG);
+
+    // 启动后先检查当前运行路径，命中中文或特殊字符时直接暂停，避免后续文件操作损坏数据。
+    var runPath = Environment.CurrentDirectory;
+    if (HasUnsafePathCharacters(runPath))
+    {
+        PrintUnsafeRunPathPause(
+            runPath,
+            "当前运行路径包含中文或特殊字符，已停止修补以避免损坏。",
+            "The current run path contains Chinese or special characters. Patching has been stopped to avoid damage."
+        );
+        return;
+    }
 
     var restoreMode = IsRestoreMode(inputArgs);
     var dryRun = IsDryRunMode(inputArgs);

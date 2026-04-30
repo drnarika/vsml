@@ -146,6 +146,33 @@ internal static class ConsoleOutput
     }
 
     /// <summary>
+    /// 输出运行路径不安全提示，并在确认后暂停退出。
+    /// </summary>
+    internal static void PrintUnsafeRunPathPause(string path, string reasonZh, string reasonEn)
+    {
+        var panelContent = new Rows(
+            new Align(new Markup("[bold red]运行路径不安全[/]"), HorizontalAlignment.Center),
+            new Align(new Markup("[grey]Unsafe run path[/]"), HorizontalAlignment.Center),
+            new Markup(string.Empty),
+            new Markup($"[white]{EscapeMarkup(path)}[/]"),
+            new Markup(string.Empty),
+            new Markup($"[yellow]{EscapeMarkup(reasonZh)}[/]"),
+            new Markup($"[grey]({EscapeMarkup(reasonEn)})[/]")
+        );
+
+        var panel = new Panel(panelContent)
+        {
+            Border = BoxBorder.Rounded,
+            Padding = new Padding(1, 1, 1, 1)
+        };
+
+        AnsiConsole.Write(panel);
+        WriteLogLine("WARN", $"运行路径不安全：{path}", $"Unsafe run path: {path}");
+        WriteLogLine("WARN", reasonZh, reasonEn);
+        Console.ReadLine();
+    }
+
+    /// <summary>
     /// 读取双语提示下的游戏路径输入。
     /// </summary>
     internal static string AskGamePath()

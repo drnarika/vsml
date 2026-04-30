@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <CetCompat>false</CetCompat>
     <TargetFramework>net10.0</TargetFramework>
     <DefaultTargetFramework>net10.0</DefaultTargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
