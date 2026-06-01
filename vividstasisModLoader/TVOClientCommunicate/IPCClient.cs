@@ -41,11 +41,11 @@ namespace vividstasisModLoader.TVOClientCommunicate
                             while (true)
                             {
                                 // 从服务端等待SYNC消息
-                                Console.WriteLine("[VML IPC] 等待TVOC消息...");
+                                Console.WriteLine("[VML IPC] 等待消息...");
                                 temp = sr.ReadLine();
 
                                 if (temp == null)
-                                    ExitWithServer("TVOC退出");
+                                    ExitWithServer("退出");
 
                                 if (!temp.StartsWith("SYNC"))
                                     continue;
@@ -54,10 +54,10 @@ namespace vividstasisModLoader.TVOClientCommunicate
                                 temp = sr.ReadLine();
 
                                 if (temp == null)
-                                    ExitWithServer("TVOC退出");
+                                    ExitWithServer("退出");
 
                                 if (temp == "EXIT")
-                                    ExitWithServer("TVOC退出");
+                                    ExitWithServer("退出");
                                 else if (temp.StartsWith("_tvocmsg_gamepath"))
                                 {
                                     Console.WriteLine($"[VML IPC] 获取到游戏路径: {temp.Substring(18)}");
